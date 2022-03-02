@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io/fs"
+	"net"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -11,9 +14,12 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport"
+	"github.com/go-git/go-git/v5/plumbing/transport/client"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
+	transportssh "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
+	"golang.org/x/crypto/ssh"
 
 	"github.com/twpayne/chezmoi/v2/pkg/chezmoi"
 )
@@ -145,6 +151,13 @@ func (c *Config) runInitCmd(cmd *cobra.Command, args []string) error {
 		}
 
 		useBuiltinGit := c.UseBuiltinGit.Value(c.useBuiltinGitAutoFunc)
+		if useBuiltinGit {
+			client.InstallProtocol("ssh", transportssh.NewClient(&ssh.ClientConfig{
+				HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+					return c.knownHostKey(cmd.Context(), hostname, remote, key)
+				},
+			}))
+		}
 
 		if len(args) == 0 {
 			if useBuiltinGit {
@@ -269,6 +282,48 @@ func (c *Config) builtinGitInit(workingTreeRawPath chezmoi.AbsPath) error {
 	return err
 }
 
+func (c *Config) knownHostKey(ctx context.Context, hostname string, remote net.Addr, key ssh.PublicKey) error {
+	switch hostname {
+	case "github.com":
+		return c.gitHubKnownHostKey(ctx, hostname, remote, key)
+	default:
+		return fmt.Errorf("%s (%s): unknown host key", hostname, remote)
+	}
+}
+
+func (c *Config) gitHubKnownHostKey(ctx context.Context, hostname string, remote net.Addr, key ssh.PublicKey) error {
+	httpClient, err := c.getHTTPClient()
+	if err != nil {
+		return err
+	}
+
+	gitHubClient := chezmoi.NewGitHubClient(ctx, httpClient)
+	apiMeta, _, err := gitHubClient.APIMeta(ctx)
+	if err != nil {
+		return err
+	}
+
+	switch ok, err := cidrsContainsAddr(apiMeta.Git, remote); {
+	case err != nil:
+		return err
+	case !ok:
+		return fmt.Errorf("%s: %s: unknown address", hostname, remote)
+	}
+
+	marshaledKey := key.Marshal()
+	for _, sshKey := range apiMeta.SSHKeys {
+		gitHubPublicKey, err := ssh.ParsePublicKey([]byte(sshKey))
+		if err != nil {
+			continue // Ignore unknown or invalid public keys.
+		}
+		if gitHubPublicKey.Type() == key.Type() && bytes.Equal(gitHubPublicKey.Marshal(), marshaledKey) {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("%s (%s): unknown host key", hostname, remote)
+}
+
 // MarshalZerologObject implements
 // github.com/rs/zerolog.LogObjectMarshaler.MarshalZerologObject.
 //
@@ -328,4 +383,21 @@ func guessDotfilesRepoURL(arg string, ssh bool) (username, repo string) {
 	}
 	repo = arg
 	return
+}
+
+func cidrsContainsAddr(cidrStrs []string, addr net.Addr) (bool, error) {
+	ip := net.ParseIP(addr.String())
+	if ip == nil {
+		return false, fmt.Errorf("%s: invalid IP address", addr)
+	}
+	for _, cidrStr := range cidrStrs {
+		_, cidr, err := net.ParseCIDR(cidrStr)
+		if err != nil {
+			continue // Ignore invalid CIDRs.
+		}
+		if cidr.Contains(ip) {
+			return true, nil
+		}
+	}
+	return false, nil
 }

@@ -1,0 +1,6 @@
+we're trying to hook our own ssh known hosts callback (knownHostKey) into chezmoi init's builtinGitClone when there is no known hosts file
+we have code to read the range of IP addressses and SSH keys from GitHub to verify
+right now the code is not being called
+it has something to do with gitssh's HostKeyCallback
+e.g. https://cs.github.com/argoproj/argo-cd/blob/f462240520c13e33c1e5fb4a23abd67368273d8a/util/git/client.go?q=lang%3Ago+go-git+HostKeyCallback#L264
+https://cs.github.com/?scopeName=All+repos&scope=&q=lang%3Ago+go-git+HostKeyCallback
