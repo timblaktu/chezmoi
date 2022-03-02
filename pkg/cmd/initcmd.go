@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"crypto/x509"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -25,16 +26,17 @@ import (
 )
 
 type initCmdConfig struct {
-	apply       bool
-	branch      string
-	configPath  chezmoi.AbsPath
-	data        bool
-	depth       int
-	exclude     *chezmoi.EntryTypeSet
-	oneShot     bool
-	purge       bool
-	purgeBinary bool
-	ssh         bool
+	apply             bool
+	branch            string
+	configPath        chezmoi.AbsPath
+	data              bool
+	depth             int
+	exclude           *chezmoi.EntryTypeSet
+	oneShot           bool
+	privateKeyAbsPath chezmoi.AbsPath
+	purge             bool
+	purgeBinary       bool
+	ssh               bool
 }
 
 var dotfilesRepoGuesses = []struct {
@@ -121,6 +123,7 @@ func (c *Config) newInitCmd() *cobra.Command {
 	flags.IntVarP(&c.init.depth, "depth", "d", c.init.depth, "Create a shallow clone")
 	flags.VarP(c.init.exclude, "exclude", "x", "Exclude entry types")
 	flags.BoolVar(&c.init.oneShot, "one-shot", c.init.oneShot, "Run in one-shot mode")
+	flags.Var(&c.init.privateKeyAbsPath, "private-key-path", "Path to private key file")
 	flags.BoolVarP(&c.init.purge, "purge", "p", c.init.purge, "Purge config and source directories after running")
 	flags.BoolVarP(&c.init.purgeBinary, "purge-binary", "P", c.init.purgeBinary, "Purge chezmoi binary after running")
 	flags.StringVar(&c.init.branch, "branch", c.init.branch, "Set initial branch to checkout")
@@ -130,6 +133,8 @@ func (c *Config) newInitCmd() *cobra.Command {
 }
 
 func (c *Config) runInitCmd(cmd *cobra.Command, args []string) error {
+	ctx := cmd.Context()
+
 	if c.init.oneShot {
 		c.force = true
 		c.init.apply = true
@@ -170,7 +175,7 @@ func (c *Config) runInitCmd(cmd *cobra.Command, args []string) error {
 		} else {
 			username, dotfilesRepoURL := guessDotfilesRepoURL(args[0], c.init.ssh)
 			if useBuiltinGit {
-				if err := c.builtinGitClone(username, dotfilesRepoURL, workingTreeRawPath); err != nil {
+				if err := c.builtinGitClone(ctx, username, dotfilesRepoURL, workingTreeRawPath); err != nil {
 					return err
 				}
 			} else {
@@ -230,7 +235,7 @@ func (c *Config) runInitCmd(cmd *cobra.Command, args []string) error {
 }
 
 // builtinGitClone clones a repo using the builtin git command.
-func (c *Config) builtinGitClone(username, url string, workingTreeRawPath chezmoi.AbsPath) error {
+func (c *Config) builtinGitClone(ctx context.Context, username, url string, workingTreeRawPath chezmoi.AbsPath) error {
 	isBare := false
 	var referenceName plumbing.ReferenceName
 	if c.init.branch != "" {
@@ -241,6 +246,49 @@ func (c *Config) builtinGitClone(username, url string, workingTreeRawPath chezmo
 		Depth:             c.init.depth,
 		ReferenceName:     referenceName,
 		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+	}
+
+	if c.init.ssh {
+		var password string
+		var publicKeys *transportssh.PublicKeys
+	FOR:
+		for {
+			var err error
+			switch publicKeys, err = transportssh.NewPublicKeysFromFile("git", c.init.privateKeyAbsPath.String(), password); {
+			case errors.Is(err, x509.IncorrectPasswordError):
+				if password, err = c.readPassword(fmt.Sprintf("Enter passphrase for key '%s': ", c.init.privateKeyAbsPath)); err != nil {
+					return err
+				}
+			case err != nil:
+				return err
+			default:
+				break FOR
+			}
+		}
+		cloneOptions.Auth = publicKeys
+
+		sshClientConfig, err := publicKeys.ClientConfig()
+		if err != nil {
+			return err
+		}
+		prevHostKeyCallback := sshClientConfig.HostKeyCallback
+		sshClientConfig.HostKeyCallback = func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+			if prevHostKeyCallback != nil {
+				if err := prevHostKeyCallback(hostname, remote, key); err != nil {
+					return nil
+				}
+			}
+			return c.knownHostKey(ctx, hostname, remote, key)
+		}
+		client.InstallProtocol("ssh", transportssh.NewClient(sshClientConfig))
+
+		_, err = git.PlainClone(workingTreeRawPath.String(), isBare, &cloneOptions)
+		c.logger.Err(err).
+			Stringer("path", workingTreeRawPath).
+			Bool("isBare", isBare).
+			Object("o", loggableGitCloneOptions(cloneOptions)).
+			Msg("PlainClone")
+		return err
 	}
 
 	for {
