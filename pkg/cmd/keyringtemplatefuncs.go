@@ -6,7 +6,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/zalando/go-keyring"
+	"github.com/99designs/keyring"
 )
 
 type keyringKey struct {
@@ -26,7 +26,10 @@ func (c *Config) keyringTemplateFunc(service, user string) string {
 	if password, ok := c.keyring.cache[key]; ok {
 		return password
 	}
-	password, err := keyring.Get(service, user)
+	ring, err := keyring.Open(keyring.Config{
+		ServiceName: service,
+	})
+	item, err := ring.Get(user)
 	if err != nil {
 		panic(fmt.Errorf("%s %s: %w", service, user, err))
 	}
@@ -35,6 +38,7 @@ func (c *Config) keyringTemplateFunc(service, user string) string {
 		c.keyring.cache = make(map[keyringKey]string)
 	}
 
-	c.keyring.cache[key] = password
-	return password
+	value := string(item.Data)
+	c.keyring.cache[key] = value
+	return value
 }

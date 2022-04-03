@@ -4,8 +4,8 @@
 package cmd
 
 import (
+	"github.com/99designs/keyring"
 	"github.com/spf13/cobra"
-	"github.com/zalando/go-keyring"
 )
 
 type secretKeyringCmdConfig struct {
@@ -78,25 +78,46 @@ func (c *Config) newSecretKeyringCmd() *cobra.Command {
 }
 
 func (c *Config) runSecretKeyringDeleteCmdE(cmd *cobra.Command, args []string) error {
-	return keyring.Delete(c.secret.keyring.delete.service, c.secret.keyring.delete.user)
-}
-
-func (c *Config) runSecretKeyringGetCmdE(cmd *cobra.Command, args []string) error {
-	value, err := keyring.Get(c.secret.keyring.get.service, c.secret.keyring.get.user)
+	ring, err := keyring.Open(keyring.Config{
+		ServiceName: c.secret.keyring.delete.service,
+	})
 	if err != nil {
 		return err
 	}
-	return c.writeOutputString(value)
+	return ring.Remove(c.secret.keyring.delete.user)
+}
+
+func (c *Config) runSecretKeyringGetCmdE(cmd *cobra.Command, args []string) error {
+	ring, err := keyring.Open(keyring.Config{
+		ServiceName: c.secret.keyring.get.service,
+	})
+	if err != nil {
+		return err
+	}
+	item, err := ring.Get(c.secret.keyring.get.user)
+	if err != nil {
+		return err
+	}
+	return c.writeOutput(item.Data)
 }
 
 func (c *Config) runSecretKeyringSetCmdE(cmd *cobra.Command, args []string) error {
-	value := c.secret.keyring.set.value
-	if value == "" {
+	ring, err := keyring.Open(keyring.Config{
+		ServiceName: c.secret.keyring.set.service,
+	})
+	if err != nil {
+		return err
+	}
+	data := c.secret.keyring.set.value
+	if data == "" {
 		var err error
-		value, err = c.readPassword("Value: ")
+		data, err = c.readPassword("Value: ")
 		if err != nil {
 			return err
 		}
 	}
-	return keyring.Set(c.secret.keyring.set.service, c.secret.keyring.set.user, value)
+	return ring.Set(keyring.Item{
+		Key:  c.secret.keyring.set.user,
+		Data: []byte(data),
+	})
 }

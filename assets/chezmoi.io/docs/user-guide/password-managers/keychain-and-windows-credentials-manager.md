@@ -2,7 +2,7 @@
 
 chezmoi includes support for Keychain (on macOS), GNOME Keyring (on Linux and
 FreeBSD), and Windows Credentials Manager (on Windows) via the
-[`zalando/go-keyring`](https://github.com/zalando/go-keyring) library.
+[`99designs/keyring`](https://github.com/99designs/keyring) library.
 
 Set values with:
 
