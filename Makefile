@@ -118,9 +118,9 @@ ensure-tools: ensure-gofumpt ensure-golangci-lint
 
 .PHONY: ensure-gofumpt
 ensure-gofumpt:
-	if [ ! -x bin/gofumpt ] || ( ./bin/gofumpt --version | grep -Fqv "v${GOFUMPT_VERSION}" ) ; then \
+	if [ ! -x bin/gofumpt ] ; then \
 		mkdir -p bin ; \
-		GOBIN=$(shell pwd)/bin ${GO} install "mvdan.cc/gofumpt@v${GOFUMPT_VERSION}" ; \
+		GOBIN=$(shell pwd)/bin ${GO} install mvdan.cc/gofumpt@latest ; \
 	fi
 
 .PHONY: ensure-golangci-lint

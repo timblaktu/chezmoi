@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"io/fs"
 	"runtime"
-	"sort"
 	"testing"
 
 	"github.com/muesli/combinator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/twpayne/chezmoi/v2/pkg/chezmoimaps"
 )
 
 func TestEntryStateEquivalent(t *testing.T) {
@@ -78,11 +79,7 @@ func TestEntryStateEquivalent(t *testing.T) {
 		"symlink_symlink_copy":  true,
 	}
 
-	entryStateKeys := make([]string, 0, len(entryStates))
-	for entryStateKey := range entryStates {
-		entryStateKeys = append(entryStateKeys, entryStateKey)
-	}
-	sort.Strings(entryStateKeys)
+	entryStateKeys := chezmoimaps.SortedKeys(entryStates)
 
 	testData := struct {
 		EntryState1Key []string

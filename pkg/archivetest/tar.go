@@ -4,13 +4,15 @@ import (
 	"archive/tar"
 	"bytes"
 	"fmt"
+
+	"github.com/twpayne/chezmoi/v2/pkg/chezmoimaps"
 )
 
 // NewTar returns the bytes of a new tar archive containing root.
 func NewTar(root map[string]any) ([]byte, error) {
 	buffer := &bytes.Buffer{}
 	tarWriter := tar.NewWriter(buffer)
-	for _, key := range sortedKeys(root) {
+	for _, key := range chezmoimaps.SortedKeys(root) {
 		if err := tarAddEntry(tarWriter, key, root[key]); err != nil {
 			return nil, err
 		}
@@ -44,7 +46,7 @@ func tarAddEntry(w *tar.Writer, name string, entry any) error {
 		}); err != nil {
 			return err
 		}
-		for _, key := range sortedKeys(entry) {
+		for _, key := range chezmoimaps.SortedKeys(entry) {
 			if err := tarAddEntry(w, name+"/"+key, entry[key]); err != nil {
 				return err
 			}
@@ -71,7 +73,7 @@ func tarAddEntry(w *tar.Writer, name string, entry any) error {
 		}); err != nil {
 			return err
 		}
-		for _, key := range sortedKeys(entry.Entries) {
+		for _, key := range chezmoimaps.SortedKeys(entry.Entries) {
 			if err := tarAddEntry(w, name+"/"+key, entry.Entries[key]); err != nil {
 				return err
 			}

@@ -2,7 +2,6 @@ package archivetest
 
 import (
 	"io/fs"
-	"sort"
 )
 
 // A Dir represents a directory.
@@ -20,13 +19,4 @@ type File struct {
 // A Symlink represents a symlink.
 type Symlink struct {
 	Target string
-}
-
-func sortedKeys(m map[string]any) []string {
-	keys := make([]string, 0, len(m))
-	for key := range m {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-	return keys
 }

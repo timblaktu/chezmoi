@@ -13,7 +13,6 @@ import (
 	"os/exec"
 	"regexp"
 	"runtime"
-	"sort"
 	"strings"
 	"text/tabwriter"
 	"time"
@@ -27,6 +26,7 @@ import (
 
 	"github.com/twpayne/chezmoi/v2/pkg/chezmoi"
 	"github.com/twpayne/chezmoi/v2/pkg/chezmoilog"
+	"github.com/twpayne/chezmoi/v2/pkg/chezmoimaps"
 	"github.com/twpayne/chezmoi/v2/pkg/git"
 )
 
@@ -493,11 +493,7 @@ func (c *configFileCheck) Run(system chezmoi.System, homeDirAbsPath chezmoi.AbsP
 		message := fmt.Sprintf("%s, last modified %s", filenameAbsPath.String(), fileInfo.ModTime().Format(time.RFC3339))
 		return checkResultOK, message
 	default:
-		filenameStrs := make([]string, 0, len(filenameAbsPaths))
-		for filenameAbsPath := range filenameAbsPaths {
-			filenameStrs = append(filenameStrs, filenameAbsPath.String())
-		}
-		sort.Strings(filenameStrs)
+		filenameStrs := chezmoimaps.SortedStringerKeys(filenameAbsPaths)
 		return checkResultWarning, fmt.Sprintf("%s: multiple config files", englishList(filenameStrs))
 	}
 }

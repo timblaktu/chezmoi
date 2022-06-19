@@ -3,7 +3,6 @@ package chezmoi
 import (
 	"fmt"
 	"io/fs"
-	"sort"
 	"testing"
 
 	"github.com/muesli/combinator"
@@ -11,6 +10,7 @@ import (
 	vfs "github.com/twpayne/go-vfs/v4"
 	"github.com/twpayne/go-vfs/v4/vfst"
 
+	"github.com/twpayne/chezmoi/v2/pkg/chezmoimaps"
 	"github.com/twpayne/chezmoi/v2/pkg/chezmoitest"
 )
 
@@ -67,17 +67,8 @@ func TestTargetStateEntryApply(t *testing.T) {
 		},
 	}
 
-	targetStateKeys := make([]string, 0, len(targetStates))
-	for targetStateKey := range targetStates {
-		targetStateKeys = append(targetStateKeys, targetStateKey)
-	}
-	sort.Strings(targetStateKeys)
-
-	actualDestDirStateKeys := make([]string, 0, len(actualStates))
-	for actualDestDirStateKey := range actualStates {
-		actualDestDirStateKeys = append(actualDestDirStateKeys, actualDestDirStateKey)
-	}
-	sort.Strings(actualDestDirStateKeys)
+	targetStateKeys := chezmoimaps.SortedKeys(targetStates)
+	actualDestDirStateKeys := chezmoimaps.SortedKeys(actualStates)
 
 	testData := struct {
 		TargetStateKey        []string
