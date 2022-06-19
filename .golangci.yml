@@ -2,8 +2,6 @@ linters:
   enable:
   - asciicheck
   - bidichk
-  - bodyclose
-  - contextcheck
   - deadcode
   - decorder
   - depguard
@@ -38,30 +36,32 @@ linters:
   - lll
   - makezero
   - misspell
-  - nilerr
-  - noctx
   - nolintlint
   - nosprintfhostport
   - prealloc
   - predeclared
   - promlinter
   - revive
-  - rowserrcheck
-  - sqlclosecheck
   - staticcheck
-  - structcheck
   - stylecheck
   - tagliatelle
   - tenv
   - thelper
   - typecheck
   - unconvert
-  - unparam
   - unused
   - varcheck
-  - wastedassign
   - whitespace
   disable:
+  - bodyclose # https://github.com/golangci/golangci-lint/issues/2649
+  - contextcheck # https://github.com/golangci/golangci-lint/issues/2649
+  - nilerr # https://github.com/golangci/golangci-lint/issues/2649
+  - noctx # https://github.com/golangci/golangci-lint/issues/2649
+  - rowserrcheck # https://github.com/golangci/golangci-lint/issues/2649
+  - sqlclosecheck # https://github.com/golangci/golangci-lint/issues/2649
+  - structcheck # https://github.com/golangci/golangci-lint/issues/2649
+  - unparam # https://github.com/golangci/golangci-lint/issues/2649
+  - wastedassign # https://github.com/golangci/golangci-lint/issues/2649
   - cyclop
   - exhaustive
   - exhaustivestruct

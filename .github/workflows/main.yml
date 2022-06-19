@@ -265,38 +265,6 @@ jobs:
         with:
           name: chezmoi-windows-amd64.exe
           path: dist/chezmoi-nocgo_windows_amd64_v1/chezmoi.exe
-  test-ubuntu-go1-17:
-    needs: changes
-    if: github.event_name == 'push' || needs.changes.outputs.code == 'true'
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-      - uses: actions/setup-go@b22fbbc2921299758641fab08929b4ac52b32923
-        with:
-          go-version: 1.17.x
-      - uses: actions/cache@30f413bfed0a2bc738fdfd409e5a9e96b24545fd
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-ubuntu-go-1-17-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-ubuntu-go-1-17-
-      - name: build
-        run: |
-          go build ./...
-      - name: run
-        run: |
-          go run . --version
-      - name: install-age
-        run: |
-          cd $(mktemp -d)
-          curl -fsSL https://github.com/FiloSottile/age/releases/download/v${AGE_VERSION}/age-v${AGE_VERSION}-linux-amd64.tar.gz | tar xzf -
-          sudo install -m 755 age/age /usr/local/bin
-          sudo install -m 755 age/age-keygen /usr/local/bin
-      - name: test
-        env:
-          CHEZMOI_GITHUB_TOKEN: ${{ secrets.CHEZMOI_GITHUB_TOKEN }}
-        run: |
-          go test ./...
   test-windows:
     needs: changes
     if: github.event_name == 'push' || needs.changes.outputs.code == 'true'
@@ -387,7 +355,6 @@ jobs:
       - test-macos
       - test-openbsd
       - test-ubuntu
-      - test-ubuntu-go1-17
       - test-windows
     runs-on: ubuntu-20.04
     steps:
