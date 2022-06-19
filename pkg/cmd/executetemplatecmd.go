@@ -59,7 +59,7 @@ func (c *Config) runExecuteTemplateCmd(cmd *cobra.Command, args []string) error 
 		promptBool[key] = value
 	}
 	if c.executeTemplate.init {
-		initTemplateFuncs := map[string]interface{}{
+		initTemplateFuncs := map[string]any{
 			"exit": c.exitInitTemplateFunc,
 			"promptBool": func(prompt string, args ...bool) bool {
 				switch len(args) {

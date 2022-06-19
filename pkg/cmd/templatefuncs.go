@@ -19,11 +19,11 @@ import (
 )
 
 type ioregData struct {
-	value map[string]interface{}
+	value map[string]any
 }
 
-func (c *Config) fromYamlTemplateFunc(s string) interface{} {
-	var data interface{}
+func (c *Config) fromYamlTemplateFunc(s string) any {
+	var data any
 	if err := chezmoi.FormatYAML.Unmarshal([]byte(s), &data); err != nil {
 		panic(err)
 	}
@@ -75,7 +75,7 @@ func (c *Config) includeTemplateFunc(filename string) string {
 	return string(contents)
 }
 
-func (c *Config) ioregTemplateFunc() map[string]interface{} {
+func (c *Config) ioregTemplateFunc() map[string]any {
 	if runtime.GOOS != "darwin" {
 		return nil
 	}
@@ -93,7 +93,7 @@ func (c *Config) ioregTemplateFunc() map[string]interface{} {
 		panic(newCmdOutputError(cmd, output, err))
 	}
 
-	var value map[string]interface{}
+	var value map[string]any
 	if _, err := plist.Unmarshal(output, &value); err != nil {
 		panic(newParseCmdOutputError(command, args, output, err))
 	}
@@ -138,7 +138,7 @@ func (c *Config) outputTemplateFunc(name string, args ...string) string {
 	return string(output)
 }
 
-func (c *Config) quoteListTemplateFunc(list []interface{}) []string {
+func (c *Config) quoteListTemplateFunc(list []any) []string {
 	result := make([]string, 0, len(list))
 	for _, elem := range list {
 		var elemStr string
@@ -159,10 +159,10 @@ func (c *Config) quoteListTemplateFunc(list []interface{}) []string {
 	return result
 }
 
-func (c *Config) statTemplateFunc(name string) interface{} {
+func (c *Config) statTemplateFunc(name string) any {
 	switch fileInfo, err := c.fileSystem.Stat(name); {
 	case err == nil:
-		return map[string]interface{}{
+		return map[string]any{
 			"name":    fileInfo.Name(),
 			"size":    fileInfo.Size(),
 			"mode":    int(fileInfo.Mode()),
@@ -177,7 +177,7 @@ func (c *Config) statTemplateFunc(name string) interface{} {
 	}
 }
 
-func (c *Config) toYamlTemplateFunc(data interface{}) string {
+func (c *Config) toYamlTemplateFunc(data any) string {
 	yaml, err := chezmoi.FormatYAML.Marshal(data)
 	if err != nil {
 		panic(err)

@@ -42,18 +42,18 @@ type onepasswordArgs struct {
 
 type onepasswordItemV1 struct {
 	Details struct {
-		Fields   []map[string]interface{} `json:"fields"`
+		Fields   []map[string]any `json:"fields"`
 		Sections []struct {
-			Fields []map[string]interface{} `json:"fields,omitempty"`
+			Fields []map[string]any `json:"fields,omitempty"`
 		} `json:"sections"`
 	} `json:"details"`
 }
 
 type onepasswordItemV2 struct {
-	Fields []map[string]interface{} `json:"fields"`
+	Fields []map[string]any `json:"fields"`
 }
 
-func (c *Config) onepasswordTemplateFunc(userArgs ...string) map[string]interface{} {
+func (c *Config) onepasswordTemplateFunc(userArgs ...string) map[string]any {
 	version, err := c.onepasswordVersion()
 	if err != nil {
 		panic(err)
@@ -81,14 +81,14 @@ func (c *Config) onepasswordTemplateFunc(userArgs ...string) map[string]interfac
 		panic(err)
 	}
 
-	var data map[string]interface{}
+	var data map[string]any
 	if err := json.Unmarshal(output, &data); err != nil {
 		panic(newParseCmdOutputError(c.Onepassword.Command, args.args, output, err))
 	}
 	return data
 }
 
-func (c *Config) onepasswordDetailsFieldsTemplateFunc(userArgs ...string) map[string]interface{} {
+func (c *Config) onepasswordDetailsFieldsTemplateFunc(userArgs ...string) map[string]any {
 	version, err := c.onepasswordVersion()
 	if err != nil {
 		panic(err)
@@ -101,7 +101,7 @@ func (c *Config) onepasswordDetailsFieldsTemplateFunc(userArgs ...string) map[st
 			panic(err)
 		}
 
-		result := make(map[string]interface{})
+		result := make(map[string]any)
 		for _, field := range item.Details.Fields {
 			if designation, ok := field["designation"].(string); ok {
 				result[designation] = field
@@ -115,7 +115,7 @@ func (c *Config) onepasswordDetailsFieldsTemplateFunc(userArgs ...string) map[st
 			panic(err)
 		}
 
-		result := make(map[string]interface{})
+		result := make(map[string]any)
 		for _, field := range item.Fields {
 			if _, ok := field["section"]; ok {
 				continue
@@ -168,7 +168,7 @@ func (c *Config) onepasswordDocumentTemplateFunc(userArgs ...string) string {
 	return string(output)
 }
 
-func (c *Config) onepasswordItemFieldsTemplateFunc(userArgs ...string) map[string]interface{} {
+func (c *Config) onepasswordItemFieldsTemplateFunc(userArgs ...string) map[string]any {
 	version, err := c.onepasswordVersion()
 	if err != nil {
 		panic(err)
@@ -181,7 +181,7 @@ func (c *Config) onepasswordItemFieldsTemplateFunc(userArgs ...string) map[strin
 			panic(err)
 		}
 
-		result := make(map[string]interface{})
+		result := make(map[string]any)
 		for _, section := range item.Details.Sections {
 			for _, field := range section.Fields {
 				if t, ok := field["t"].(string); ok {
@@ -197,7 +197,7 @@ func (c *Config) onepasswordItemFieldsTemplateFunc(userArgs ...string) map[strin
 			panic(err)
 		}
 
-		result := make(map[string]interface{})
+		result := make(map[string]any)
 		for _, field := range item.Fields {
 			if _, ok := field["section"]; !ok {
 				continue

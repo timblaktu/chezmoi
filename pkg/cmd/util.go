@@ -159,8 +159,8 @@ func uniqueAbbreviations(values []string) map[string]string {
 
 // upperSnakeCaseToCamelCaseKeys returns m with all keys converted from
 // UPPER_SNAKE_CASE to camelCase.
-func upperSnakeCaseToCamelCaseMap(m map[string]interface{}) map[string]interface{} {
-	result := make(map[string]interface{})
+func upperSnakeCaseToCamelCaseMap(m map[string]any) map[string]any {
+	result := make(map[string]any)
 	for k, v := range m {
 		result[upperSnakeCaseToCamelCase(k)] = v
 	}
@@ -168,9 +168,9 @@ func upperSnakeCaseToCamelCaseMap(m map[string]interface{}) map[string]interface
 }
 
 // validateKeys ensures that all keys in data match re.
-func validateKeys(data interface{}, re *regexp.Regexp) error {
+func validateKeys(data any, re *regexp.Regexp) error {
 	switch data := data.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		for key, value := range data {
 			if !re.MatchString(key) {
 				return fmt.Errorf("%s: invalid key", key)
@@ -179,7 +179,7 @@ func validateKeys(data interface{}, re *regexp.Regexp) error {
 				return err
 			}
 		}
-	case []interface{}:
+	case []any:
 		for _, value := range data {
 			if err := validateKeys(value, re); err != nil {
 				return err

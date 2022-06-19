@@ -28,8 +28,8 @@ func TestSourceStateAdd(t *testing.T) {
 		name         string
 		destAbsPaths []AbsPath
 		addOptions   AddOptions
-		extraRoot    interface{}
-		tests        []interface{}
+		extraRoot    any
+		tests        []any
 	}{
 		{
 			name: "dir",
@@ -39,7 +39,7 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_dir",
 					vfst.TestIsDir,
 					vfst.TestModePerm(0o777&^chezmoitest.Umask),
@@ -60,12 +60,12 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			extraRoot: map[string]interface{}{
-				"/home/user": map[string]interface{}{
+			extraRoot: map[string]any{
+				"/home/user": map[string]any{
 					".local/share/chezmoi/exact_dot_dir/file": "# contents of .dir/file\n",
 				},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/exact_dot_dir",
 					vfst.TestDoesNotExist,
 				),
@@ -88,7 +88,7 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_dir",
 					vfst.TestIsDir,
 					vfst.TestModePerm(0o777&^chezmoitest.Umask),
@@ -108,10 +108,10 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			extraRoot: map[string]interface{}{
+			extraRoot: map[string]any{
 				"/home/user/.local/share/chezmoi/dot_dir": &vfst.Dir{Perm: 0o777},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_dir/file",
 					vfst.TestModeIsRegular,
 					vfst.TestContentsString("# contents of .dir/file\n"),
@@ -126,7 +126,7 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_dir",
 					vfst.TestIsDir,
 					vfst.TestModePerm(0o777&^chezmoitest.Umask),
@@ -148,7 +148,7 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_dir",
 					vfst.TestIsDir,
 					vfst.TestModePerm(0o777&^chezmoitest.Umask),
@@ -175,10 +175,10 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			extraRoot: map[string]interface{}{
+			extraRoot: map[string]any{
 				"/home/user/.local/share/chezmoi/dot_dir/subdir": &vfst.Dir{Perm: 0o777},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_dir/subdir/file",
 					vfst.TestModeIsRegular,
 					vfst.TestContentsString("# contents of .dir/subdir/file\n"),
@@ -193,10 +193,10 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			extraRoot: map[string]interface{}{
+			extraRoot: map[string]any{
 				"/home/user/.readonly_dir": &vfst.Dir{Perm: 0o555},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/readonly_dot_readonly_dir",
 					vfst.TestIsDir,
 					vfst.TestModePerm(0o777&^chezmoitest.Umask),
@@ -211,7 +211,7 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_empty",
 					vfst.TestDoesNotExist,
 				),
@@ -226,7 +226,7 @@ func TestSourceStateAdd(t *testing.T) {
 				Empty:   true,
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/empty_dot_empty",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -242,7 +242,7 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/executable_dot_executable",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -258,7 +258,7 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_executable",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -275,7 +275,7 @@ func TestSourceStateAdd(t *testing.T) {
 				Create:  true,
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/create_dot_create",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -291,7 +291,7 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_file",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -307,10 +307,10 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			extraRoot: map[string]interface{}{
+			extraRoot: map[string]any{
 				"/home/user/.local/share/chezmoi/executable_dot_file": "# contents of .file\n",
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_file",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -329,10 +329,10 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			extraRoot: map[string]interface{}{
+			extraRoot: map[string]any{
 				"/home/user/.local/share/chezmoi/dot_file": "# old contents of .file\n",
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_file",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -348,7 +348,7 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/private_dot_private",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -364,7 +364,7 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_private",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -380,13 +380,13 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			extraRoot: map[string]interface{}{
+			extraRoot: map[string]any{
 				"/home/user/.readonly": &vfst.File{
 					Perm:     0o444,
 					Contents: []byte("# contents of .readonly\n"),
 				},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/readonly_dot_readonly",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -402,7 +402,7 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/symlink_dot_symlink",
 					vfst.TestModeIsRegular,
 					vfst.TestContentsString(".dir/subdir/file\n"),
@@ -417,12 +417,12 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			extraRoot: map[string]interface{}{
-				"/home/user": map[string]interface{}{
+			extraRoot: map[string]any{
+				"/home/user": map[string]any{
 					".symlink_windows": &vfst.Symlink{Target: ".dir\\subdir\\file"},
 				},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/symlink_dot_symlink_windows",
 					vfst.TestModeIsRegular,
 					vfst.TestContentsString(".dir/subdir/file\n"),
@@ -438,7 +438,7 @@ func TestSourceStateAdd(t *testing.T) {
 				AutoTemplate: true,
 				Include:      NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_template.tmpl",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -455,7 +455,7 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_dir",
 					vfst.TestIsDir,
 					vfst.TestModePerm(0o777&^chezmoitest.Umask),
@@ -475,10 +475,10 @@ func TestSourceStateAdd(t *testing.T) {
 			addOptions: AddOptions{
 				Include: NewEntryTypeSet(EntryTypesAll),
 			},
-			extraRoot: map[string]interface{}{
+			extraRoot: map[string]any{
 				"/home/user/.local/share/chezmoi/dot_dir/exact_subdir": &vfst.Dir{Perm: 0o777},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_dir/exact_subdir/file",
 					vfst.TestModeIsRegular,
 					vfst.TestContentsString("# contents of .dir/subdir/file\n"),
@@ -489,12 +489,12 @@ func TestSourceStateAdd(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			chezmoitest.SkipUnlessGOOS(t, tc.name)
 
-			chezmoitest.WithTestFS(t, map[string]interface{}{
-				"/home/user": map[string]interface{}{
+			chezmoitest.WithTestFS(t, map[string]any{
+				"/home/user": map[string]any{
 					".create": "# contents of .create\n",
-					".dir": map[string]interface{}{
+					".dir": map[string]any{
 						"file": "# contents of .dir/file\n",
-						"subdir": map[string]interface{}{
+						"subdir": map[string]any{
 							"file": "# contents of .dir/subdir/file\n",
 						},
 					},
@@ -504,8 +504,8 @@ func TestSourceStateAdd(t *testing.T) {
 						Contents: []byte("# contents of .executable\n"),
 					},
 					".file": "# contents of .file\n",
-					".local": map[string]interface{}{
-						"share": map[string]interface{}{
+					".local": map[string]any{
+						"share": map[string]any{
 							"chezmoi": &vfst.Dir{Perm: 0o777},
 						},
 					},
@@ -529,7 +529,7 @@ func TestSourceStateAdd(t *testing.T) {
 					WithDestDir(NewAbsPath("/home/user")),
 					WithSourceDir(NewAbsPath("/home/user/.local/share/chezmoi")),
 					WithSystem(system),
-					withUserTemplateData(map[string]interface{}{
+					withUserTemplateData(map[string]any{
 						"variable": "value",
 					}),
 				)
@@ -562,10 +562,10 @@ func TestSourceStateAddInExternal(t *testing.T) {
 	}))
 	defer httpServer.Close()
 
-	root := map[string]interface{}{
-		"/home/user": map[string]interface{}{
+	root := map[string]any{
+		"/home/user": map[string]any{
 			".dir/file2": "# contents of .dir/file2\n",
-			".local/share/chezmoi": map[string]interface{}{
+			".local/share/chezmoi": map[string]any{
 				".chezmoiexternal.toml": chezmoitest.JoinLines(
 					`[".dir"]`,
 					`    type = "archive"`,
@@ -617,28 +617,28 @@ func TestSourceStateAddInExternal(t *testing.T) {
 func TestSourceStateApplyAll(t *testing.T) {
 	for _, tc := range []struct {
 		name               string
-		root               interface{}
+		root               any
 		sourceStateOptions []SourceStateOption
-		tests              []interface{}
+		tests              []any
 	}{
 		{
 			name: "empty",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
 					".local/share/chezmoi": &vfst.Dir{Perm: 0o777},
 				},
 			},
 		},
 		{
 			name: "dir",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
-					".local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
+					".local/share/chezmoi": map[string]any{
 						"dot_dir": &vfst.Dir{Perm: 0o777},
 					},
 				},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.dir",
 					vfst.TestIsDir,
 					vfst.TestModePerm(0o777&^chezmoitest.Umask),
@@ -647,17 +647,17 @@ func TestSourceStateApplyAll(t *testing.T) {
 		},
 		{
 			name: "dir_exact",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
-					".dir": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
+					".dir": map[string]any{
 						"file": "# contents of .dir/file\n",
 					},
-					".local/share/chezmoi": map[string]interface{}{
+					".local/share/chezmoi": map[string]any{
 						"exact_dot_dir": &vfst.Dir{Perm: 0o777},
 					},
 				},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.dir",
 					vfst.TestIsDir,
 					vfst.TestModePerm(0o777&^chezmoitest.Umask),
@@ -669,14 +669,14 @@ func TestSourceStateApplyAll(t *testing.T) {
 		},
 		{
 			name: "file",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
-					".local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
+					".local/share/chezmoi": map[string]any{
 						"dot_file": "# contents of .file\n",
 					},
 				},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.file",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -686,15 +686,15 @@ func TestSourceStateApplyAll(t *testing.T) {
 		},
 		{
 			name: "file_remove_empty",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
 					".empty": "# contents of .empty\n",
-					".local/share/chezmoi": map[string]interface{}{
+					".local/share/chezmoi": map[string]any{
 						"dot_empty": "",
 					},
 				},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.empty",
 					vfst.TestDoesNotExist,
 				),
@@ -702,14 +702,14 @@ func TestSourceStateApplyAll(t *testing.T) {
 		},
 		{
 			name: "file_create_empty",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
-					".local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
+					".local/share/chezmoi": map[string]any{
 						"empty_dot_empty": "",
 					},
 				},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.empty",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -719,19 +719,19 @@ func TestSourceStateApplyAll(t *testing.T) {
 		},
 		{
 			name: "file_template",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
-					".local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
+					".local/share/chezmoi": map[string]any{
 						"dot_template.tmpl": "key = {{ .variable }}\n",
 					},
 				},
 			},
 			sourceStateOptions: []SourceStateOption{
-				withUserTemplateData(map[string]interface{}{
+				withUserTemplateData(map[string]any{
 					"variable": "value",
 				}),
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.template",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -741,14 +741,14 @@ func TestSourceStateApplyAll(t *testing.T) {
 		},
 		{
 			name: "create",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
-					".local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
+					".local/share/chezmoi": map[string]any{
 						"create_dot_create": "# contents of .create\n",
 					},
 				},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.create",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -758,15 +758,15 @@ func TestSourceStateApplyAll(t *testing.T) {
 		},
 		{
 			name: "create_no_replace",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
-					".local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
+					".local/share/chezmoi": map[string]any{
 						"create_dot_create": "# contents of .create\n",
 					},
 					".create": "# existing contents of .create\n",
 				},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.create",
 					vfst.TestModeIsRegular,
 					vfst.TestModePerm(0o666&^chezmoitest.Umask),
@@ -776,14 +776,14 @@ func TestSourceStateApplyAll(t *testing.T) {
 		},
 		{
 			name: "symlink",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
-					".local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
+					".local/share/chezmoi": map[string]any{
 						"symlink_dot_symlink": ".dir/subdir/file\n",
 					},
 				},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.symlink",
 					vfst.TestModeType(fs.ModeSymlink),
 					vfst.TestSymlinkTarget(filepath.FromSlash(".dir/subdir/file")),
@@ -792,14 +792,14 @@ func TestSourceStateApplyAll(t *testing.T) {
 		},
 		{
 			name: "symlink_template",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
-					".local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
+					".local/share/chezmoi": map[string]any{
 						"symlink_dot_symlink.tmpl": `{{ ".dir/subdir/file" }}` + "\n",
 					},
 				},
 			},
-			tests: []interface{}{
+			tests: []any{
 				vfst.TestPath("/home/user/.symlink",
 					vfst.TestModeType(fs.ModeSymlink),
 					vfst.TestSymlinkTarget(filepath.FromSlash(".dir/subdir/file")),
@@ -836,21 +836,21 @@ func TestSourceStateApplyAll(t *testing.T) {
 func TestSourceStateRead(t *testing.T) {
 	for _, tc := range []struct {
 		name                string
-		root                interface{}
+		root                any
 		expectedError       string
 		expectedSourceState *SourceState
 	}{
 		{
 			name: "empty",
-			root: map[string]interface{}{
+			root: map[string]any{
 				"/home/user/.local/share/chezmoi": &vfst.Dir{Perm: 0o777},
 			},
 			expectedSourceState: NewSourceState(),
 		},
 		{
 			name: "dir",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					"dir": &vfst.Dir{
 						Perm: 0o777 &^ chezmoitest.Umask,
 					},
@@ -873,8 +873,8 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "file",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					"dot_file": "# contents of .file\n",
 				},
 			},
@@ -898,8 +898,8 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "duplicate_target_file",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					"dot_file":      "# contents of .file\n",
 					"dot_file.tmpl": "# contents of .file\n",
 				},
@@ -908,8 +908,8 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "duplicate_target_dir",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					"dir": &vfst.Dir{
 						Perm: 0o777 &^ chezmoitest.Umask,
 					},
@@ -922,8 +922,8 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "duplicate_target_script",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					"run_script":      "#!/bin/sh\n",
 					"run_once_script": "#!/bin/sh\n",
 				},
@@ -932,8 +932,8 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "symlink_with_attr",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".file":               "# contents of .file\n",
 					"executable_dot_file": &vfst.Symlink{Target: ".file"},
 				},
@@ -959,8 +959,8 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "symlink_script",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".script":    "# contents of .script\n",
 					"run_script": &vfst.Symlink{Target: ".script"},
 				},
@@ -985,8 +985,8 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "script",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					"run_script": "# contents of script\n",
 				},
 			},
@@ -1010,8 +1010,8 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "symlink",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					"symlink_dot_symlink": ".dir/subdir/file",
 				},
 			},
@@ -1034,9 +1034,9 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "file_in_dir",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
-					"dir": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
+					"dir": map[string]any{
 						"file": "# contents of .dir/file\n",
 					},
 				},
@@ -1071,8 +1071,8 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "chezmoiignore",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".chezmoiignore": "README.md\n",
 				},
 			},
@@ -1086,8 +1086,8 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "chezmoiignore_ignore_file",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".chezmoiignore": "README.md\n",
 					"README.md":      "",
 				},
@@ -1105,15 +1105,15 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "chezmoiignore_exact_dir",
-			root: map[string]interface{}{
-				"/home/user/dir": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/dir": map[string]any{
 					"file1": "# contents of dir/file1\n",
 					"file2": "# contents of dir/file2\n",
 					"file3": "# contents of dir/file3\n",
 				},
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".chezmoiignore": "dir/file3\n",
-					"exact_dir": map[string]interface{}{
+					"exact_dir": map[string]any{
 						"file1": "# contents of dir/file1\n",
 					},
 				},
@@ -1161,9 +1161,9 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "chezmoiremove",
-			root: map[string]interface{}{
+			root: map[string]any{
 				"/home/user/file": "",
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".chezmoiremove": "file\n",
 				},
 			},
@@ -1183,12 +1183,12 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "chezmoiremove_and_ignore",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
 					"file1": "",
 					"file2": "",
 				},
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".chezmoiignore": "file2\n",
 					".chezmoiremove": "file*\n",
 				},
@@ -1217,14 +1217,14 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "chezmoiremove_and_ignore_in_subdir",
-			root: map[string]interface{}{
-				"/home/user": map[string]interface{}{
-					"dir": map[string]interface{}{
+			root: map[string]any{
+				"/home/user": map[string]any{
+					"dir": map[string]any{
 						"file1": "",
 						"file2": "",
 					},
 				},
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					"dir/.chezmoiignore": "file2\n",
 					"dir/.chezmoiremove": "file*\n",
 				},
@@ -1263,9 +1263,9 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "chezmoitemplates",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
-					".chezmoitemplates": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
+					".chezmoitemplates": map[string]any{
 						"template": "# contents of .chezmoitemplates/template\n",
 					},
 				},
@@ -1280,8 +1280,8 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "chezmoiversion",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".chezmoiversion": "1.2.3\n",
 				},
 			},
@@ -1289,10 +1289,10 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "chezmoiversion_multiple",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".chezmoiversion": "1.2.3\n",
-					"dir": map[string]interface{}{
+					"dir": map[string]any{
 						".chezmoiversion": "2.3.4\n",
 					},
 				},
@@ -1301,9 +1301,9 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "ignore_dir",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
-					".dir": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
+					".dir": map[string]any{
 						"file": "# contents of .dir/file\n",
 					},
 				},
@@ -1312,8 +1312,8 @@ func TestSourceStateRead(t *testing.T) {
 		},
 		{
 			name: "ignore_file",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".file": "# contents of .file\n",
 				},
 			},
@@ -1365,13 +1365,13 @@ func TestSourceStateReadExternal(t *testing.T) {
 
 	for _, tc := range []struct {
 		name              string
-		root              interface{}
+		root              any
 		expectedExternals map[RelPath]External
 	}{
 		{
 			name: "external_yaml",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".chezmoiexternal.yaml": chezmoitest.JoinLines(
 						`file:`,
 						`    type: "file"`,
@@ -1389,8 +1389,8 @@ func TestSourceStateReadExternal(t *testing.T) {
 		},
 		{
 			name: "external_toml",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".chezmoiexternal.toml": chezmoitest.JoinLines(
 						`[file]`,
 						`    type = "file"`,
@@ -1408,8 +1408,8 @@ func TestSourceStateReadExternal(t *testing.T) {
 		},
 		{
 			name: "external_in_subdir",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi/dot_dir": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi/dot_dir": map[string]any{
 					".chezmoiexternal.yaml": chezmoitest.JoinLines(
 						`file:`,
 						`    type: "file"`,
@@ -1447,14 +1447,14 @@ func TestSourceStateReadExternal(t *testing.T) {
 func TestSourceStateReadScriptsConcurrent(t *testing.T) {
 	for _, tc := range []struct {
 		name string
-		root interface{}
+		root any
 	}{
 		{
 			name: "with_ignore",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					".chezmoiignore": ".chezmoiscripts/linux/**\n",
-					".chezmoiscripts": map[string]interface{}{
+					".chezmoiscripts": map[string]any{
 						"linux":  manyScripts(1000),
 						"darwin": manyScripts(1000),
 					},
@@ -1502,8 +1502,8 @@ func TestSourceStateReadExternalCache(t *testing.T) {
 		},
 	}
 
-	chezmoitest.WithTestFS(t, map[string]interface{}{
-		"/home/user/.local/share/chezmoi": map[string]interface{}{
+	chezmoitest.WithTestFS(t, map[string]any{
+		"/home/user/.local/share/chezmoi": map[string]any{
 			".chezmoiexternal.yaml": chezmoitest.JoinLines(
 				`.dir:`,
 				`    type: "archive"`,
@@ -1550,7 +1550,7 @@ func TestSourceStateReadExternalCache(t *testing.T) {
 func TestSourceStateTargetRelPaths(t *testing.T) {
 	for _, tc := range []struct {
 		name                   string
-		root                   interface{}
+		root                   any
 		expectedTargetRelPaths []RelPath
 	}{
 		{
@@ -1560,8 +1560,8 @@ func TestSourceStateTargetRelPaths(t *testing.T) {
 		},
 		{
 			name: "scripts",
-			root: map[string]interface{}{
-				"/home/user/.local/share/chezmoi": map[string]interface{}{
+			root: map[string]any{
+				"/home/user/.local/share/chezmoi": map[string]any{
 					"run_before_1before": "",
 					"run_before_2before": "",
 					"run_before_3before": "",
@@ -1664,7 +1664,7 @@ func withRemove(remove *patternSet) SourceStateOption {
 }
 
 // withUserTemplateData adds template data.
-func withUserTemplateData(templateData map[string]interface{}) SourceStateOption {
+func withUserTemplateData(templateData map[string]any) SourceStateOption {
 	return func(s *SourceState) {
 		RecursiveMerge(s.userTemplateData, templateData)
 	}
@@ -1676,8 +1676,8 @@ func withTemplates(templates map[string]*template.Template) SourceStateOption {
 	}
 }
 
-func manyScripts(amount int) map[string]interface{} {
-	scripts := map[string]interface{}{}
+func manyScripts(amount int) map[string]any {
+	scripts := map[string]any{}
 	for i := 0; i < amount; i++ {
 		scripts[fmt.Sprintf("run_onchange_before_%d.sh", i)] = ""
 	}

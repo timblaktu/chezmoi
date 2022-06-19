@@ -132,7 +132,7 @@ func TestParseConfig(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			chezmoitest.WithTestFS(t, map[string]interface{}{
+			chezmoitest.WithTestFS(t, map[string]any{
 				"/home/user/.config/chezmoi/" + tc.filename: tc.contents,
 			}, func(fileSystem vfs.FS) {
 				c := newTestConfig(t, fileSystem)
@@ -158,7 +158,7 @@ func TestUpperSnakeCaseToCamelCase(t *testing.T) {
 
 func TestValidateKeys(t *testing.T) {
 	for _, tc := range []struct {
-		data        interface{}
+		data        any
 		expectedErr bool
 	}{
 		{
@@ -166,7 +166,7 @@ func TestValidateKeys(t *testing.T) {
 			expectedErr: false,
 		},
 		{
-			data: map[string]interface{}{
+			data: map[string]any{
 				"foo":                    "bar",
 				"a":                      0,
 				"_x9":                    false,
@@ -176,23 +176,23 @@ func TestValidateKeys(t *testing.T) {
 			expectedErr: false,
 		},
 		{
-			data: map[string]interface{}{
+			data: map[string]any{
 				"foo-foo": "bar",
 			},
 			expectedErr: true,
 		},
 		{
-			data: map[string]interface{}{
-				"foo": map[string]interface{}{
+			data: map[string]any{
+				"foo": map[string]any{
 					"bar-bar": "baz",
 				},
 			},
 			expectedErr: true,
 		},
 		{
-			data: map[string]interface{}{
-				"foo": []interface{}{
-					map[string]interface{}{
+			data: map[string]any{
+				"foo": []any{
+					map[string]any{
 						"bar-bar": "baz",
 					},
 				},
